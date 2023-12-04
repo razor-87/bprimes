@@ -1,1 +1,1 @@
-## Prime numbers in 80-byte blocks
+## The first million prime numbers in 64-byte blocks

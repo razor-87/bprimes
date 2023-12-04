@@ -1,14 +1,16 @@
 package bprimes
 
 import (
+	"math/rand"
 	"testing"
 )
 
 func TestIsPrime(t *testing.T) {
 	tests := []struct {
-		n    uint
+		n    uint32
 		want bool
 	}{
+		{1, false},
 		{2, true},
 		{3, true},
 		{5, true},
@@ -80,6 +82,9 @@ func TestIsPrime(t *testing.T) {
 		{999983, true},
 		{999999, false},
 		{1000000, false},
+		{15485861, false},
+		{15485863, true},
+		{15485864, false},
 	}
 	t.Run("fast", func(t *testing.T) {
 		for _, tt := range tests {
@@ -88,4 +93,28 @@ func TestIsPrime(t *testing.T) {
 			}
 		}
 	})
+}
+
+func BenchmarkIsPrimeSeq(b *testing.B) {
+	for i := 0; i <= limit; i++ {
+		_ = IsPrime(uint32(i))
+	}
+	for i := 1; i <= limit; i += 2 {
+		_ = IsPrime(uint32(i))
+	}
+	for i := limit; 0 <= i; i-- {
+		_ = IsPrime(uint32(i))
+	}
+}
+
+func BenchmarkIsPrimeRand(b *testing.B) {
+	r := rand.New(rand.NewSource(42))
+	b.ResetTimer()
+	var ri uint32
+	for i := 0; i < 20000; i++ {
+		b.StopTimer()
+		ri = uint32(r.Intn(limit))
+		b.StartTimer()
+		_ = IsPrime(ri)
+	}
 }
