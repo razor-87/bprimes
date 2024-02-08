@@ -68,13 +68,22 @@ func TestIsPrime(t *testing.T) {
 		{997, true},
 		{1001, false},
 		{4001, true},
+		{4087, false},
+		{4489, false},
 		{4993, true},
 		{4999, true},
+		{8249, false},
 		{99989, true},
 		{99991, true},
 		{99999, false},
+		{16459, false},
+		{32777, false},
+		{65567, false},
 		{100000, false},
 		{100003, true},
+		{131093, false},
+		{262159, false},
+		{524311, false},
 		{899981, true},
 		{899987, false},
 		{899999, false},
@@ -82,6 +91,12 @@ func TestIsPrime(t *testing.T) {
 		{999983, true},
 		{999999, false},
 		{1000000, false},
+		{1048603, false},
+		{2097167, false},
+		{4147009, true},
+		{4194313, false},
+		{8388613, false},
+		{12432853, true},
 		{15485861, false},
 		{15485863, true},
 		{15485864, false},
@@ -89,7 +104,7 @@ func TestIsPrime(t *testing.T) {
 	t.Run("fast", func(t *testing.T) {
 		for _, tt := range tests {
 			if got := IsPrime(tt.n); got != tt.want {
-				t.Errorf("IsPrime() = %v, want %v", got, tt.want)
+				t.Errorf("IsPrime() = %v, want %v, %d", got, tt.want, tt.n)
 			}
 		}
 	})
