@@ -14,10 +14,10 @@ import (
 )
 
 const (
-	m         = 80
+	m         = 96
 	blockLen  = 16
 	k         = m * blockLen
-	blocksLen = 12099  // limit/k + 1
+	blocksLen = 10082  // limit/k + 1
 	template  = ":%#x" // or %#b
 )
 
@@ -36,44 +36,44 @@ func main() {
 	fmt.Fprintf(buf, "\n%s%d%s\n", "var blocks = [", blocksLen, "]block{")
 
 	var (
-		p, i, q, r int
-		bitset     uint32
+		p, q, r int
+		blocks  [blocksLen][blockLen]uint32
 	)
-	newLine := true
 	sc := bufio.NewScanner(f)
 
-	for s := 0; s < 3; s++ { // skip first three rows
+	for i := 0; i < 5; i++ { // skip first five rows
 		_ = sc.Scan()
 	}
-	bitset = 1 << odd2Shift[3] // set bit for 3
-	for sc.Scan() {            // start from 7
-		p, _ = strconv.Atoi(sc.Text())
+	p, _ = strconv.Atoi(sc.Text()) // first prime is 11
 
-		r = p % k
-		if r/m != i {
-			fmt.Fprintf(buf, strconv.Itoa(i)+template, bitset)
-
-			if p/k == q {
-				fmt.Fprint(buf, ",")
-			} else {
-				fmt.Fprintln(buf, "},")
-				newLine = true
-			}
-			bitset = 0
+	for n := 9; n <= 15485863; n += 2 {
+		if n%3 == 0 || n%5 == 0 || n%7 == 0 {
+			continue
 		}
 
-		q = p / k
-		if newLine {
-			fmt.Fprint(buf, "\t"+strconv.Itoa(q)+":{")
-			newLine = false
+		if n == p {
+			q, r = n/k, n%k
+			blocks[q][r/m] |= (1 << odd2Shift[uint8(r%m)])
+			_ = sc.Scan()
+			p, _ = strconv.Atoi(sc.Text())
 		}
-
-		bitset |= (1 << odd2Shift[uint8(p%m)])
-		i = r / m
 	}
 
-	fmt.Fprintf(buf, strconv.Itoa(i)+template, bitset)
-	fmt.Fprintln(buf, "},")
+	bound := blockLen - 1
+	for i := range blocks {
+		fmt.Fprint(buf, "\t"+strconv.Itoa(i)+":{")
+		for j := range blocks[i] {
+			if bitset := blocks[i][j]; bitset != 0 {
+				fmt.Fprintf(buf, strconv.Itoa(j)+template, blocks[i][j])
+				if j != bound {
+					fmt.Fprint(buf, ",")
+				}
+			}
+			if j == bound {
+				fmt.Fprintln(buf, "},")
+			}
+		}
+	}
 	fmt.Fprintln(buf, "}")
 
 	if err := sc.Err(); err != nil {
@@ -92,35 +92,35 @@ func main() {
 
 var odd2Shift = map[uint8]uint8{
 	1:  0,
-	3:  1,
+	5:  1,
 	7:  2,
-	9:  3,
-	11: 4,
-	13: 5,
-	17: 6,
-	19: 7,
-	21: 8,
-	23: 9,
-	27: 10,
-	29: 11,
-	31: 12,
-	33: 13,
-	37: 14,
-	39: 15,
-	41: 16,
-	43: 17,
-	47: 18,
-	49: 19,
-	51: 20,
-	53: 21,
-	57: 22,
-	59: 23,
-	61: 24,
-	63: 25,
-	67: 26,
-	69: 27,
-	71: 28,
-	73: 29,
-	77: 30,
-	79: 31,
+	11: 3,
+	13: 4,
+	17: 5,
+	19: 6,
+	23: 7,
+	25: 8,
+	29: 9,
+	31: 10,
+	35: 11,
+	37: 12,
+	41: 13,
+	43: 14,
+	47: 15,
+	49: 16,
+	53: 17,
+	55: 18,
+	59: 19,
+	61: 20,
+	65: 21,
+	67: 22,
+	71: 23,
+	73: 24,
+	77: 25,
+	79: 26,
+	83: 27,
+	85: 28,
+	89: 29,
+	91: 30,
+	95: 31,
 }
